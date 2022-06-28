@@ -4,18 +4,21 @@
 
 IU_EXTERN_C_BEGIN
 
+//~ This file forward declarations
+typedef struct Iu_Event Iu_Event;
+
 //~ Event object
 
 typedef enum {
     Iu_EventType_PipeDataReady,
 } Iu_EventType_;
 
-typedef struct {
+typedef struct Iu_Event {
     void (*eventDeleter)(Iu_Event* object);
     Iu_EventType_ eventType;
 } Iu_Event;
 
-void Iu_FreeEvent(Iu_Event event);
+void Iu_FreeEvent(Iu_Event* event);
 
 //~ Event queue
 
