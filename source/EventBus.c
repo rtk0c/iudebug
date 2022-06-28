@@ -5,9 +5,6 @@
 
 void Iu_FreeEvent(Iu_Event* event) {
     event->eventDeleter(event);
-    
-    // Memory allocations store the size, since Iu_Event will be the first field in whatever event struct this actually this, they have the same address (mandated by standard)
-    free(event);
 }
 
 struct Iu_EventQueue {

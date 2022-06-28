@@ -12,7 +12,7 @@
 #define IU_KB(x) ((x) << 10)
 #define IU_MB(x) ((x) << 20)
 #define IU_GB(x) ((x) << 30)
-#define IU_TB(x) (((u64)x) << 40)
+#define IU_TB(x) (((uint64_t)x) << 40)
 
 #define IU_ARRAY_SIZE(arr) sizeof(arr)/sizeof(arr[0])
 

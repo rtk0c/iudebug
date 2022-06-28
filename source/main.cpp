@@ -1,4 +1,11 @@
-#include "App.hpp"
+#include "AppState.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "ImGuiFileBrowser.h"
+#include "ImGuiTextEditor.h"
+#include "DebugEngine.hpp"
+#include "DebugEngineGdb.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -8,13 +15,46 @@
 #include <cstdlib>
 #include <string>
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-
 static void GlfwErrorCallback(int error, const char* description) {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
+
+struct App {
+    IDebugEngine* debugEngine;
+    
+    App() {
+        // TODO(rtk0c): support for cppdbg on windows
+        // TODO(hnsom): write some kind of custom in-process debug engine
+        this->debugEngine = new DebugEngineGdb();
+    }
+    
+    ~App() {
+        delete debugEngine;
+    }
+    
+    void Show() {
+        ImGui::BeginMainMenuBar();
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Load exe...")) {
+                // TODO
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+        
+        ImGui::Begin("Callstack");
+        ImGui::End();
+        
+        ImGui::Begin("Watches");
+        ImGui::End();
+        
+        ImGui::Begin("Breakpoints");
+        ImGui::End();
+        
+        ImGui::Begin("Text File");
+        ImGui::End();
+    }
+};
 
 int main() {
     glfwSetErrorCallback(&GlfwErrorCallback);
@@ -66,6 +106,10 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glslVersion);
     
+    gAppRtState = new AppRuntimeState();
+    gAppPersistState = new AppPersistentState();
+    gAppPersistState->Init();
+    
     ImVec4 clearColor(0.45f, 0.55f, 0.60f, 1.00f);
     App app;
     while (!glfwWindowShouldClose(window)) {
@@ -76,6 +120,10 @@ int main() {
         ImGui::NewFrame();
         
         app.Show();
+        if (gAppRtState->persistStateModified) {
+            gAppRtState->persistStateModified = false;
+            gAppPersistState->Save();
+        }
         
         ImGui::Render();
         int dispalyWidth, displayHeight;

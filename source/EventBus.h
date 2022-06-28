@@ -7,7 +7,7 @@ IU_EXTERN_C_BEGIN
 //~ Event object
 
 typedef enum {
-    Iu_EventType_PipeOutputReady,
+    Iu_EventType_PipeDataReady,
 } Iu_EventType_;
 
 typedef struct {
