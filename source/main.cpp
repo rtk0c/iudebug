@@ -21,6 +21,7 @@ static void GlfwErrorCallback(int error, const char* description) {
 
 struct App {
     IDebugEngine* debugEngine;
+    bool showDemoWindow = false;
     
     App() {
         // TODO(rtk0c): support for cppdbg on windows
@@ -32,17 +33,64 @@ struct App {
         delete debugEngine;
     }
     
-    void Show() {
-        ImGui::BeginMainMenuBar();
+    void ShowMenus() {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Load exe...")) {
                 // TODO
             }
             ImGui::EndMenu();
         }
-        ImGui::EndMainMenuBar();
+        if (ImGui::BeginMenu("Options")) {
+            ImGui::MenuItem("ImGui demo window", nullptr, &showDemoWindow);
+            ImGui::EndMenu();
+        }
+    }
+    
+    void Show() {
+        auto& io = ImGui::GetIO();
+        auto viewport = ImGui::GetMainViewport();
         
+        //~ Setup main dockspace window, as well as the menu bar
+        {
+            constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            constexpr ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
+            
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::SetNextWindowSize(viewport->WorkSize);
+            ImGui::SetNextWindowViewport(viewport->ID);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            ImGui::Begin("MainViewport", nullptr, windowFlags);
+            ImGui::PopStyleVar(3);
+            
+            ImGui::BeginMenuBar();
+            this->ShowMenus();
+            ImGui::EndMenuBar();
+            
+            auto dockspaceId = ImGui::GetID("DockSpace");
+            ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
+            
+            ImGui::End();
+        }
+        
+        auto& callstack = debugEngine->GetCallstack();
+        
+        //~ ImGui library windows
+        if (showDemoWindow) {
+            ImGui::ShowDemoWindow(&showDemoWindow);
+        }
+        
+        //~ App windows
         ImGui::Begin("Callstack");
+        if (ImGui::BeginTable("Callstack", 1)) {
+            // TODO column headers
+            
+            for (auto& frame : callstack.frames) {
+                // TODO
+            }
+            ImGui::EndTable();
+        }
         ImGui::End();
         
         ImGui::Begin("Watches");
@@ -96,7 +144,7 @@ int main() {
     
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-
+    
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -139,7 +187,7 @@ int main() {
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backupCurrentCtx);
         }
-
+        
         glfwSwapBuffers(window);
     }
     

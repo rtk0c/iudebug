@@ -20,3 +20,7 @@ void DebugEngineGdb::Shutdown() {
         conn = nullptr;
     }
 }
+
+Callstack& DebugEngineGdb::GetCallstack() {
+    return callstack;
+}

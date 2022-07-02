@@ -4,6 +4,7 @@
 #include "LibGdbConn.h"
 
 struct DebugEngineGdb : public IDebugEngine {
+    Callstack callstack;
     Iu_GdbConnection* conn = nullptr;
     
     DebugEngineGdb();
@@ -11,4 +12,5 @@ struct DebugEngineGdb : public IDebugEngine {
     
     void Start() override;
     void Shutdown() override;
+    Callstack& GetCallstack() override;
 };
