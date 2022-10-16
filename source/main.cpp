@@ -158,6 +158,17 @@ int main() {
     gAppPersistState = new AppPersistentState();
     gAppPersistState->Init();
     
+    auto& conf = *gAppPersistState;
+    switch (conf.theme) {
+        case ImGuiTheme::Dark: ImGui::StyleColorsDark(); break;
+        case ImGuiTheme::Light: ImGui::StyleColorsLight(); break;
+        case ImGuiTheme::Classic: ImGui::StyleColorsClassic(); break;
+    }
+    if (/*the string is not empty*/ conf.fontFilePath[0] != '\0') {
+        // TODO(hnsom): fontconfig? windows directwrite based lookup? macos whatever?
+        io.Fonts->AddFontFromFileTTF(conf.fontFilePath, conf.fontSize);
+    }
+    
     ImVec4 clearColor(0.45f, 0.55f, 0.60f, 1.00f);
     App app;
     while (!glfwWindowShouldClose(window)) {
