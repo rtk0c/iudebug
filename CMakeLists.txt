@@ -4,6 +4,7 @@ project(IuDebug LANGUAGES C CXX)
 find_package(Threads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(Freetype REQUIRED)
 add_subdirectory(3rdparty/glad)
 
 file(GLOB_RECURSE IuDebug_SOURCES
@@ -17,6 +18,7 @@ target_link_libraries(IuDebug
 PRIVATE
     Threads::Threads
     OpenGL::GL
+	Freetype::Freetype
     glfw
     glad
 )
