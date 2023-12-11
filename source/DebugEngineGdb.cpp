@@ -10,7 +10,7 @@ DebugEngineGdb::~DebugEngineGdb() {
 }
 
 void DebugEngineGdb::Start() {
-    const char* gdbExePath = gAppPersistState->gdbExePath;
+    const char* gdbExePath = gAppConf->gdbExePath;
     this->conn = Iu_GdbInit(gdbExePath);
 }
 

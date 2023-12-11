@@ -30,12 +30,15 @@ static void IniGetPath(char* buffer, IniReader& reader, std::string_view section
         memset(buffer, 0, kPathMax);
 }
 
-void AppPersistentState::Init() {
+AppConfig::AppConfig() {
     char filePath[kPathMax];
     GetAppConfigIniPath(filePath, sizeof(filePath));
     
     IniReader reader;
     if (reader.ParseFile(filePath) != 0) return;
+    
+    // Section: General
+    IniGetPath(dataFilePath, reader, "General"sv, "DataFile"sv);
     
     // Section: Appearance
     IniGetPath(fontFilePath, reader, "Appearance"sv, "Font"sv);
@@ -55,14 +58,19 @@ void AppPersistentState::Init() {
     
     // Section: DebugEngine.GDB
     IniGetPath(gdbExePath, reader, "DebugEngine.GDB"sv, "ExeFile"sv);
+}
+
+void AppPersistentState::Init() {
+    FILE* file = fopen(gAppConf->dataFilePath, "r");
+    if (!file) return;
     
+    // TODO(rtk0c)
+    
+    fclose(file);
 }
 
 void AppPersistentState::Save() {
-    char filePath[kPathMax];
-    GetAppConfigIniPath(filePath, sizeof(filePath));
-    
-    FILE* file = fopen(filePath, "w");
+    FILE* file = fopen(gAppConf->dataFilePath, "w");
     if (!file) return;
     
     // TODO(rtk0c): is there anything that we want to save?
@@ -70,5 +78,7 @@ void AppPersistentState::Save() {
     fclose(file);
 }
 
+// Initialized in main()
+AppConfig* gAppConf = nullptr;
 AppRuntimeState* gAppRtState = nullptr;
 AppPersistentState* gAppPersistState = nullptr;

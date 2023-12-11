@@ -71,6 +71,7 @@ Iu_Event* Iu_DequeueEvent(Iu_EventQueue* queue) {
 static void QueueResizeRing(Iu_EventQueue* queue, int newSize) {
     assert(newSize > queue->ringLength);
     
+    // TODO(rtk0c) maybe we want realloc here? on *nix platforms it can actually be significantly faster than the malloc/copy pair
     Iu_Event** oldRing = queue->ring;
     Iu_Event** newRing = malloc(sizeof(Iu_Event*) * newSize);
     queue->ring = newRing;

@@ -99,17 +99,27 @@ typedef struct {
 //~ Main API struct
 
 typedef struct {
+    // Loader object, for internal uses only
     void* loader;
+    
     Iu_Elf64Section* sections;
     Iu_Elf64Segment* segments;
     size_t segmentCount;
     size_t sectionCount;
+    
+    // Discriminator for `loader`, for internal uses only
     int loaderTag;
 } Iu_Elf64;
 
 void Iu_InitElf64(Iu_Elf64* data);
-
-void Iu_CreateElf64FromMmapLoader(Iu_Elf64* data, int fd);
 void Iu_DestroyElf64(Iu_Elf64* data);
+
+typedef enum {
+    Iu_CreateElf64MmapLoader_err_Success,
+    Iu_CreateElf64MmapLoader_err_IoError,
+} Iu_CreateElf64MmapLoader_err_t;
+
+Iu_CreateElf64MmapLoader_err_t
+Iu_CreateElf64MmapLoader(Iu_Elf64* data, int fd);
 
 IU_EXTERN_C_END

@@ -18,7 +18,7 @@ target_link_libraries(IuDebug
 PRIVATE
     Threads::Threads
     OpenGL::GL
-	Freetype::Freetype
+    Freetype::Freetype
     glfw
     glad
 )

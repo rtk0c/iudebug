@@ -131,7 +131,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
     
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui Command Palette Example", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "IuDebug", nullptr, nullptr);
     if (window == nullptr) {
         return -2;
     }
@@ -154,19 +154,20 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glslVersion);
     
+    gAppConf = new AppConfig();
     gAppRtState = new AppRuntimeState();
     gAppPersistState = new AppPersistentState();
     gAppPersistState->Init();
     
-    auto& conf = *gAppPersistState;
-    switch (conf.theme) {
-        case ImGuiTheme::Dark: ImGui::StyleColorsDark(); break;
-        case ImGuiTheme::Light: ImGui::StyleColorsLight(); break;
-        case ImGuiTheme::Classic: ImGui::StyleColorsClassic(); break;
+    switch (gAppConf->theme) {
+        using enum ImGuiTheme;
+        case Dark: ImGui::StyleColorsDark(); break;
+        case Light: ImGui::StyleColorsLight(); break;
+        case Classic: ImGui::StyleColorsClassic(); break;
     }
-    if (/*the string is not empty*/ conf.fontFilePath[0] != '\0') {
+    if (/*the string is not empty*/ gAppConf->fontFilePath[0] != '\0') {
         // TODO(hnsom): fontconfig? windows directwrite based lookup? macos whatever?
-        io.Fonts->AddFontFromFileTTF(conf.fontFilePath, conf.fontSize);
+        io.Fonts->AddFontFromFileTTF(gAppConf->fontFilePath, gAppConf->fontSize);
     }
     
     ImVec4 clearColor(0.45f, 0.55f, 0.60f, 1.00f);
