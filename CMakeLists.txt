@@ -7,24 +7,32 @@ find_package(glfw3 REQUIRED)
 find_package(Freetype REQUIRED)
 add_subdirectory(3rdparty/glad)
 
-file(GLOB_RECURSE IuDebug_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/src/*.c
-    ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
-)
-add_executable(IuDebug ${IuDebug_SOURCES})
-
-target_include_directories(IuDebug PRIVATE src/)
-target_link_libraries(IuDebug
-PRIVATE
-    Threads::Threads
-    OpenGL::GL
+file(GLOB_RECURSE ImGui_SOURCES src/ImGui/*.c src/ImGui/*.cpp)
+add_library(ImGui ${ImGui_SOURCES})
+# ImGui stuff only ever use relative includes
+#target_include_directories(ImGui PRIVATE src)
+target_link_libraries(ImGui
+PUBLIC
     Freetype::Freetype
+    OpenGL::GL
     glfw
     glad
 )
 
-target_compile_features(IuDebug PUBLIC cxx_std_20)
-set_target_properties(IuDebug PROPERTIES
+file(GLOB_RECURSE IuDebug_SOURCES src/IuDebug/*.c src/IuDebug/*.cpp)
+add_executable(IuDebug ${IuDebug_SOURCES})
+target_include_directories(IuDebug PRIVATE src/)
+target_link_libraries(IuDebug
+PRIVATE
+    Threads::Threads
+    ImGui
+)
+
+# Properties for everything!
+set_target_properties(
+    ImGui IuDebug
+PROPERTIES
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
 )

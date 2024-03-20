@@ -1,9 +1,4 @@
 #include "AppState.hpp"
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "ImGuiFileBrowser.h"
-#include "ImGuiTextEditor.h"
 #include "DebugEngine.hpp"
 #include "DebugEngineGdb.hpp"
 
@@ -13,6 +8,11 @@
 #include <glad/glad.h>
 #include <cstdio>
 #include <cstdlib>
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_impl_glfw.h>
+#include <ImGui/imgui_impl_opengl3.h>
+#include <ImGui/ImGuiFileBrowser.h>
+#include <ImGui/ImGuiTextEditor.h>
 #include <string>
 
 static void GlfwErrorCallback(int error, const char* description) {
@@ -22,17 +22,17 @@ static void GlfwErrorCallback(int error, const char* description) {
 struct App {
     IDebugEngine* debugEngine;
     bool showDemoWindow = false;
-    
+
     App() {
         // TODO(rtk0c): support for cppdbg on windows
         // TODO(hnsom): write some kind of custom in-process debug engine
         this->debugEngine = new DebugEngineGdb();
     }
-    
+
     ~App() {
         delete debugEngine;
     }
-    
+
     void ShowMenus() {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Load exe...")) {
@@ -45,16 +45,16 @@ struct App {
             ImGui::EndMenu();
         }
     }
-    
+
     void Show() {
         auto& io = ImGui::GetIO();
         auto viewport = ImGui::GetMainViewport();
-        
+
         //~ Setup main dockspace window, as well as the menu bar
         {
             constexpr ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
             constexpr ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_None;
-            
+
             ImGui::SetNextWindowPos(viewport->WorkPos);
             ImGui::SetNextWindowSize(viewport->WorkSize);
             ImGui::SetNextWindowViewport(viewport->ID);
@@ -63,42 +63,42 @@ struct App {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
             ImGui::Begin("MainViewport", nullptr, windowFlags);
             ImGui::PopStyleVar(3);
-            
+
             ImGui::BeginMenuBar();
             this->ShowMenus();
             ImGui::EndMenuBar();
-            
+
             auto dockspaceId = ImGui::GetID("DockSpace");
             ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), dockspaceFlags);
-            
+
             ImGui::End();
         }
-        
+
         auto& callstack = debugEngine->GetCallstack();
-        
+
         //~ ImGui library windows
         if (showDemoWindow) {
             ImGui::ShowDemoWindow(&showDemoWindow);
         }
-        
+
         //~ App windows
         ImGui::Begin("Callstack");
         if (ImGui::BeginTable("Callstack", 1)) {
             // TODO column headers
-            
+
             for (auto& frame : callstack.frames) {
                 // TODO
             }
             ImGui::EndTable();
         }
         ImGui::End();
-        
+
         ImGui::Begin("Watches");
         ImGui::End();
-        
+
         ImGui::Begin("Breakpoints");
         ImGui::End();
-        
+
         ImGui::Begin("Text File");
         ImGui::End();
     }
@@ -108,8 +108,8 @@ int main() {
     glfwSetErrorCallback(&GlfwErrorCallback);
     if (!glfwInit()) {
         return -1;
-    }    
-    
+    }
+
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100
@@ -130,35 +130,35 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 #endif
-    
+
     GLFWwindow* window = glfwCreateWindow(1280, 720, "IuDebug", nullptr, nullptr);
     if (window == nullptr) {
         return -2;
     }
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-    
+
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         return -3;
     }
-    
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    
+
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     //io.ConfigViewportsNoAutoMerge = true;
     //io.ConfigViewportsNoTaskBarIcon = true;
-    
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glslVersion);
-    
+
     gAppConf = new AppConfig();
     gAppRtState = new AppRuntimeState();
     gAppPersistState = new AppPersistentState();
     gAppPersistState->Init();
-    
+
     switch (gAppConf->theme) {
         using enum ImGuiTheme;
         case Dark: ImGui::StyleColorsDark(); break;
@@ -169,22 +169,22 @@ int main() {
         // TODO(hnsom): fontconfig? windows directwrite based lookup? macos whatever?
         io.Fonts->AddFontFromFileTTF(gAppConf->fontFilePath, gAppConf->fontSize);
     }
-    
+
     ImVec4 clearColor(0.45f, 0.55f, 0.60f, 1.00f);
     App app;
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        
+
         app.Show();
         if (gAppRtState->persistStateModified) {
             gAppRtState->persistStateModified = false;
             gAppPersistState->Save();
         }
-        
+
         ImGui::Render();
         int dispalyWidth, displayHeight;
         glfwGetFramebufferSize(window, &dispalyWidth, &displayHeight);
@@ -192,24 +192,24 @@ int main() {
         glClearColor(clearColor.x * clearColor.w, clearColor.y * clearColor.w, clearColor.z * clearColor.w, clearColor.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
+
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
             GLFWwindow* backupCurrentCtx = glfwGetCurrentContext();
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
             glfwMakeContextCurrent(backupCurrentCtx);
         }
-        
+
         glfwSwapBuffers(window);
     }
-    
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
-    
+
     ImGui::DestroyContext();
-    
+
     glfwDestroyWindow(window);
     glfwTerminate();
-    
+
     return 0;
 }
