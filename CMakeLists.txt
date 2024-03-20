@@ -8,12 +8,12 @@ find_package(Freetype REQUIRED)
 add_subdirectory(3rdparty/glad)
 
 file(GLOB_RECURSE IuDebug_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/source/*.c
-    ${CMAKE_CURRENT_LIST_DIR}/source/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/*.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
 )
 add_executable(IuDebug ${IuDebug_SOURCES})
 
-target_include_directories(IuDebug PRIVATE sources/)
+target_include_directories(IuDebug PRIVATE src/)
 target_link_libraries(IuDebug
 PRIVATE
     Threads::Threads
