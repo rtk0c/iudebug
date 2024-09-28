@@ -8,11 +8,11 @@
 #include <glad/glad.h>
 #include <cstdio>
 #include <cstdlib>
-#include <ImGui/imgui.h>
-#include <ImGui/imgui_impl_glfw.h>
-#include <ImGui/imgui_impl_opengl3.h>
-#include <ImGui/ImGuiFileBrowser.h>
-#include <ImGui/ImGuiTextEditor.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/ImGuiFileBrowser.h>
+#include <imgui/ImGuiTextEditor.h>
 #include <string>
 
 static void GlfwErrorCallback(int error, const char* description) {
